@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Word Guess</title>
+</head>
+
+<body>
+  <div class="alert-container" data-alert-container></div>
+
+  <!-- Profile Section -->
+  <div class="profile-container">
+    <button class="profile-button" data-profile-button><svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="feather feather-user">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+      </svg></button>
+  </div>
+
+
+
+  <div class="center-container"> <!-- New container for centering -->
+    <!-- Slider Section -->
+    <div id="levelDisplay">Selected Level : Easy</div>
+    <div class="slider-container">
+      <div class="slides" id="slides">
+        <div class="slide" data-level="easy"></div>
+        <div class="slide" data-level="medium"></div>
+        <div class="slide" data-level="hard"></div>
+        <div class="slide" data-level="professor"></div>
+        <div class="slide" data-level="movies"></div>
+        <div class="slide" data-level="pubg"></div>
+        <div class="slide" data-level="cars"></div>
+        <div class="slide" data-level="bikes"></div>
+        <div class="slide" data-level="food"></div>
+        <div class="slide" data-level="social"></div>
+        <div class="slide" data-level="india"></div>
+      </div>  
+      <button class="arrow left" onclick="prevSlide()">❮</button>
+      <button class="arrow right" onclick="nextSlide()">❯</button>
+    </div>
+  
+
+  
+    <div class="play-container">
+      <button class="play-button" data-play-button>Play</button>
+    </div>
+  </div>  
+
+  <div class="game-container">
+    <div data-guess-grid class="guess-grid"></div>
+  
+    <!-- Container for search and clue buttons (initially hidden) -->
+    <div class="button-container" style="display: none;">
+      <button id="search-letters-button" onclick="showSearchPopup()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10.5" cy="10.5" r="7" stroke="currentColor" stroke-width="2"/>
+          <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Search
+      </button>
+      
+      <button id="clue-button" onclick="revealClueLetter()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8.13 2 5 5.13 5 9C5 11.38 6.19 13.47 8 14.74V17C8 17.55 8.45 18 9 18H15C15.55 18 16 17.55 16 17V14.74C17.81 13.47 19 11.38 19 9C19 5.13 15.87 2 12 2ZM10 22H14V20H10V22Z" fill="currentColor"/>
+        </svg>
+        Clue
+      </button>
+    </div>
+  
+    <div data-keyboard class="keyboard">
+      <button class="key" data-key="Q">Q</button>
+      <button class="key" data-key="W">W</button>
+      <button class="key" data-key="E">E</button>
+      <button class="key" data-key="R">R</button>
+      <button class="key" data-key="T">T</button>
+      <button class="key" data-key="Y">Y</button>
+      <button class="key" data-key="U">U</button>
+      <button class="key" data-key="I">I</button>
+      <button class="key" data-key="O">O</button>
+      <button class="key" data-key="P">P</button>
+      <div class="space"></div>
+      <button class="key" data-key="A">A</button>
+      <button class="key" data-key="S">S</button>
+      <button class="key" data-key="D">D</button>
+      <button class="key" data-key="F">F</button>
+      <button class="key" data-key="G">G</button>
+      <button class="key" data-key="H">H</button>
+      <button class="key" data-key="J">J</button>
+      <button class="key" data-key="K">K</button>
+      <button class="key" data-key="L">L</button>
+      <div class="space"></div>
+      <button data-enter class="key large">Enter</button>
+      <button class="key" data-key="Z">Z</button>
+      <button class="key" data-key="X">X</button>
+      <button class="key" data-key="C">C</button>
+      <button class="key" data-key="V">V</button>
+      <button class="key" data-key="B">B</button>
+      <button class="key" data-key="N">N</button>
+      <button class="key" data-key="M">M</button>
+      <button data-delete class="key large">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+          <path fill="var(--color-tone-1)" d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-11.59-2L14 13.41 17.59 17 19 15.59 15.41 12 19 8.41 17.59 7 14 10.59 10.41 7 9 8.41 12.59 12 9 15.59z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+
+  <!-- Search Pop-up -->
+  <div id="search-popup" class="search-popup">
+    <h3>Search Words</h3>
+    
+    <div class="search-container">
+        <div class="search-field">
+            <label for="starting-with">Starting with:</label>
+            <input type="text" id="starting-with" placeholder="Starts with..." />
+        </div>
+        <div class="search-field">
+            <label for="ending-with">Ending with:</label>
+            <input type="text" id="ending-with" placeholder="Ends with..." />
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-field">
+            <label for="include-letters">Include letters:</label>
+            <input type="text" id="include-letters" placeholder="Letters to include" />
+        </div>
+        <div class="search-field">
+            <label for="exclude-letters">Exclude letters:</label>
+            <input type="text" id="exclude-letters" placeholder="Letters to exclude" />
+        </div>
+      </div>
+    
+      <div class="button-container">
+        <button onclick="searchWords()">Search</button>
+        <button onclick="closeSearchPopup()">Close</button>
+      </div>
+    
+      <div id="search-results"></div>
+    </div>
+
+
+
+
+
+  <div class="profile-popup" data-profile-popup style="display: none;"> 
+    <div class="popup-content">
+        <h3>Game Stats</h3>
+        <p>Profile ID: <span data-profile-id>Not Set</span></p> <!-- New profile ID display -->
+        <p>Total Games Played: <span data-total-games-played>0</span></p>
+        <p>Games Won: <span data-total-games-won>0</span></p>
+        <p>Total Guesses: <span data-total-guesses>0</span></p>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+              <div class="progress-fill" style="width: 0%;"></div>
+          </div>
+          <p>Games Lost: <span data-total-games-lost>0</span></p>
+        </div>
+
+        <button data-close-profile>Close</button>
+    </div>
+  </div>
+
+
+  
+
+  <!-- End Game Popup -->
+  <div class="end-popup" data-end-popup>
+    <div class="popup-content">
+      <p class="correct-word" data-correct-word></p> <!-- Display the correct word -->
+      <button data-restart-button>Restart</button> <!-- Restart game button -->
+      <button data-home-button>Home</button> <!-- Go back to home (play button) -->
+    </div>
+  </div>
+
+
+  <script src="script.js" defer></script>
+  
+</body>
+</html>

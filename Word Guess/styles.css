@@ -1,0 +1,700 @@
+*, *::after, *::before {
+  box-sizing: border-box;
+  font-family: Arial;
+}
+
+body {
+  background-color: hsl(240, 3%, 7%);
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  min-height: 100vh;
+  margin: 0;
+  padding: 1em;
+  font-size: clamp(.4rem, 2vmin, 1.2rem);
+}
+
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(auto, 1.5em)); /* Increased from 1.25em to 1.5em */
+  grid-auto-rows: 4em; /* Increased from 3em to 4em */
+  gap: .25em; /* Increased gap between keys */
+  justify-content: center;
+}
+
+.key {
+  font-size: inherit;
+  grid-column: span 2;
+  border: none;
+  padding: 0.5em; /* Added padding to increase key size */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: hsl(
+    var(--hue, 200),
+    var(--saturation, 1%),
+    calc(var(--lightness-offset, 0%) + var(--lightness, 51%))
+  );
+  color: white;
+  fill: white;
+  text-transform: uppercase;
+  border-radius: .25em;
+  cursor: pointer;
+  user-select: none;
+  height: 4em; /* Added height to give a consistent size */
+}
+
+.key.large {
+  grid-column: span 3;
+}
+
+.key > svg {
+  width: 2.5em; /* Increased from 1.75em to 2.5em */
+  height: 2.5em; /* Increased from 1.75em to 2.5em */
+}
+
+.key:hover, .key:focus {
+  --lightness-offset: 10%;
+}
+
+.key.wrong {
+  --lightness: 23%;
+}
+
+.key.wrong-location {
+  --hue: 49;
+  --saturation: 51%;
+  --lightness: 47%;
+}
+
+.key.correct {
+  --hue: 115;
+  --saturation: 29%;
+  --lightness: 43%;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center elements horizontally */
+  height: 80vh; /* Set a height for the container */
+  width: 100%; /* Full width */
+  max-width: 600px; /* Optional: max width to keep it contained */
+  padding: 20px; /* Optional padding */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for aesthetics */
+}
+
+.guess-grid {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  flex-grow: 1;
+  grid-template-columns: repeat(5, 4em); /* Keep this the same if you want uniformity */
+  grid-template-rows: repeat(6, 4em);
+  gap: .25em; /* Increased gap for consistency */
+  margin-bottom: 0.5em; /* Adjusted for consistency */
+}
+
+
+.tile {
+  font-size: 2em;
+  color: white;
+  border: .05em solid hsl(240, 2%, 23%);
+  text-transform: uppercase;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  transition: transform 250ms linear;
+}
+
+.tile[data-state="active"] {
+  border-color: hsl(200, 1%, 34%);
+}
+
+.tile[data-state="wrong"] {
+  border: none;
+  background-color: hsl(240, 2%, 23%);
+}
+
+.tile[data-state="wrong-location"] {
+  border: none;
+  background-color: hsl(49, 51%, 47%);
+}
+
+.tile[data-state="correct"] {
+  border: none;
+  background-color: hsl(115, 29%, 43%);
+}
+
+.tile.shake {
+  animation: shake 250ms ease-in-out;
+}
+
+.tile.dance {
+  animation: dance 500ms ease-in-out;
+}
+
+.tile.flip {
+  transform: rotateX(90deg);
+}
+
+.play-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.play-button {
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 auto;
+}
+
+.play-button:hover {
+  background-color: #45a049;
+}
+
+
+@keyframes shake {
+  10% {
+    transform: translateX(-5%);
+  }
+
+  30% {
+    transform: translateX(5%);
+  }
+
+  50% {
+    transform: translateX(-7.5%);
+  }
+
+  70% {
+    transform: translateX(7.5%);
+  }
+
+  90% {
+    transform: translateX(-5%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes dance {
+  20% {
+    transform: translateY(-50%);
+  }  
+
+  40% {
+    transform: translateY(5%);
+  }  
+
+  60% {
+    transform: translateY(-25%);
+  }  
+
+  80% {
+    transform: translateY(2.5%);
+  }  
+
+  90% {
+    transform: translateY(-5%);
+  }  
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.alert-container {
+  position: fixed;
+  top: 10vh;
+  left: 50vw;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.alert {
+  pointer-events: none;
+  background-color: hsl(204, 7%, 85%);
+  padding: .75em;
+  border-radius: .25em;
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
+  margin-bottom: .5em;
+}
+
+.alert:last-child {
+  margin-bottom: 0;
+}
+
+.alert.hide {
+  opacity: 0;
+}
+
+
+.guess-grid, .keyboard {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.guess-grid.show, .keyboard.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Class to show the grid and keyboard */
+.show {
+  display: grid;
+}
+
+.hidden {
+  display: none;
+}
+
+
+
+
+
+
+
+/* CSS for the end game popup */
+.end-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  padding: 20px;
+  background-color: white;
+  border: 2px solid #333;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 1000; /* Ensure popup is above all other elements */
+  display: none; /* Hidden by default */
+}
+
+.end-popup.show {
+  display: block; /* Show the popup when the 'show' class is added */
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.correct-word {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+/* Button Styles */
+button[data-restart-button],
+button[data-home-button] {
+  width: 100px; /* Fixed width for buttons */
+  margin: 10px 0; /* Margin above and below buttons */
+  padding: 10px; /* Padding inside buttons */
+  background-color: #007bff; /* Primary color */
+  color: white; /* Text color */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 1rem; /* Font size */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+/* Hover effect */
+button[data-restart-button]:hover,
+button[data-home-button]:hover {
+  background-color: #0056b3; /* Darker color on hover */
+}
+
+/* Focus effect for accessibility */
+button[data-restart-button]:focus,
+button[data-home-button]:focus {
+  outline: none; /* Remove default focus outline */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Add custom focus outline */
+}
+
+/* Active state for buttons */
+button[data-restart-button]:active,
+button[data-home-button]:active {
+  transform: scale(0.95); /* Slightly shrink button when pressed */
+}
+
+
+.tile[data-state="clue"], #clue-button {
+  color: rgb(235, 239, 234);
+  font-weight: bold;
+  background-color: hsl(115, 29%, 43%);
+}
+
+
+/* Main container for buttons */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin: 0.5em auto; /* Negative top margin */
+}
+
+/* Styles for the search letters button */
+#search-letters-button, #clue-button {
+  width: 4em;
+  height: 5em;
+  font-size: 0.6em; /* Increased font size */
+  text-align: center;
+  color: white;
+  background-color: hsl(240, 3%, 20%);
+  border: none;
+  border-radius: 0.25em;
+  cursor: pointer;
+
+  /* Center icon and text inside the button */
+  display: flex;
+  flex-direction: column; /* Stack icon and text vertically */
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  gap: 0.3em; /* Space between icon and text */
+}
+
+#search-letters-button svg, #clue-button svg {
+  width: 1.5em; /* Adjust icon size as needed */
+  height: 1.5em;
+}
+
+
+/* Apply consistent margin to all sections */
+.guess-grid, .keyboard, .button-container {
+  margin: 0.5em auto;
+}
+
+
+
+
+.profile-container {
+  position: absolute;        /* Enables positioning relative to the nearest positioned ancestor */
+  top: 20px;                /* Distance from the top of the viewport */
+  right: 20px;              /* Distance from the right of the viewport */
+  z-index: 1000;            /* Ensures it stays above other elements */
+}
+
+.profile-button {
+  display: flex;               /* Makes the button a flex container */
+  align-items: center;         /* Centers the SVG and text vertically */
+  justify-content: center;     /* Centers the SVG and text horizontally */
+  width: 50px;                 /* Set a fixed width */
+  height: 50px;                /* Set a fixed height */
+  background-color: #414447;  /* Button background color */
+  color: white;                /* Text color */
+  border: none;                /* Removes default border */
+  border-radius: 50%;          /* Makes the button round */
+  cursor: pointer;             /* Changes cursor to pointer on hover */
+  transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+.profile-button svg {
+  width: 60%;  /* Set SVG width to fill 60% of the button */
+}
+
+.profile-button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+
+
+
+/* Progress Bar Styles */
+.progress-container {
+  margin: 15px 0; /* Margin above and below the progress container */
+}
+
+
+
+/* Close button specific styles */
+[data-close-profile] {
+  background-color: #dc3545; /* Bootstrap danger color */
+}
+
+[data-close-profile]:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+
+
+
+.search-popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  border: 1px solid #000;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  width: 400px; /* Set a width for the popup */
+  max-height: 400px; /* Set a max height for the popup */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds max height */
+}
+
+.search-container {
+  display: flex; /* Use flexbox to align inputs side by side */
+  justify-content: space-between; /* Space between input fields */
+  margin-bottom: 10px; /* Space below the input fields */
+}
+
+.search-field {
+  flex: 1; /* Allow input fields to take equal space */
+  margin-right: 10px; /* Add space between fields */
+}
+
+.search-field:last-child {
+  margin-right: 0; /* Remove margin for the last field */
+}
+
+input[type="text"] {
+  width: 100%; /* Make inputs fill the available width */
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.button-container button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 5px; /* Space between buttons */
+}
+
+.button-container button:hover {
+  background-color: #0056b3; /* Darken button on hover */
+}
+
+#search-results {
+  margin-top: 10px; /* Space above search results */
+}
+
+
+
+
+
+/* Center the center container */
+.center-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+
+
+
+.slider-container { 
+  width: 30vw; /* Set width to a percentage of viewport width */
+  height: 30vw; /* Set height equal to width for square aspect ratio */
+  margin: 20px auto;
+  border: 2px solid #333;
+  border-radius: 20px;
+  overflow: hidden; /* Ensures content stays within rounded corners */
+  transition: background-image 0.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Flex settings for slides */
+.slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 100%; /* Matches container width */
+  height: 100%; /* Matches container height */
+}
+
+/* Individual slide styles */
+.slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 10px;
+
+}
+
+/* Background styles for each level */
+[data-level="easy"],
+[data-level="medium"],
+[data-level="hard"],
+[data-level="professor"],
+[data-level="movies"],
+[data-level="pubg"],
+[data-level="cars"],
+[data-level="bikes"],
+[data-level="food"],
+[data-level="social"],
+[data-level="india"] {
+  width: 100%; /* Fill the container's width */
+  height: 100%; /* Fill the container's height */
+  background-size: cover; /* Ensures the background fills the entire slide */
+  background-position: center; /* Centers the background image */
+  background-repeat: no-repeat; /* Prevents tiling of the image */
+}
+
+/* Specific background images for each level */
+[data-level="easy"] { background-image: url("images/easy.jpg"); }
+[data-level="medium"] { background-image: url("images/medium.jpg"); }
+[data-level="hard"] { background-image: url("images/hard.jpg"); }
+[data-level="professor"] { background-image: url("images/professor.jpg"); }
+[data-level="movies"] { background-image: url("images/movie.jpg"); }
+[data-level="pubg"] { background-image: url("images/pubg.jpg"); }
+[data-level="cars"] { background-image: url("images/cars.jpg"); }
+[data-level="bikes"] { background-image: url("images/bikes.jpg"); }
+[data-level="food"] { background-image: url("images/food.jpg"); }
+[data-level="social"] { background-image: url("images/social.jpg"); }
+[data-level="india"] { background-image: url("images/indian.jpg"); }
+
+
+
+
+/* Profile Popup */
+.profile-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff; /* White background for the popup */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Slightly larger shadow for depth */
+  max-width: 400px; /* Max width for the popup */
+  width: 100%; /* Full width for smaller screens */
+  text-align: center; /* Center text in the popup */
+}
+
+/* Popup Heading */
+.popup-content h3 {
+  margin: 0 0 15px; /* Margin below the heading */
+  font-size: 1.8em; /* Larger font size for the heading */
+  color: #333; /* Darker color for the heading */
+}
+
+/* Popup Paragraphs */
+.popup-content p {
+  margin: 10px 0; /* Margin around paragraphs */
+  font-size: 1em; /* Standard font size */
+  color: #555; /* Slightly lighter color for paragraphs */
+}
+
+.progress-bar {
+  background-color: #e2e8f0; /* Background for the progress bar */
+  border-radius: 0.25rem; /* Rounded corners */
+  height: 0.5rem; /* Height of the progress bar */
+  overflow: hidden; /* Prevent overflow of inner div */
+}
+
+.progress-fill {
+  background-color: #4299e1; /* Fill color for the progress */
+  height: 100%; /* Fill the entire height */
+  transition: width 0.3s ease; /* Smooth transition for width change */
+}
+
+[data-close-profile] {
+  background-color: #3182ce; /* Close button color */
+  color: white; /* Text color */
+  padding: 0.5rem 1rem; /* Padding */
+  border: none; /* No border */
+  border-radius: 0.5rem; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.2s; /* Smooth background color change */
+}
+
+[data-close-profile]:hover {
+  background-color: #2b6cb0; /* Darker color on hover */
+}
+
+
+
+
+/* Arrow button styles */
+.arrow {
+  position: absolute;
+  top: 50%; /* Center arrows vertically */
+  transform: translateY(-50%); /* Adjust for vertical centering */
+  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 50%; /* Round buttons */
+  width: 40px; /* Width of the arrow buttons */
+  height: 40px; /* Height of the arrow buttons for square shape */
+}
+
+.arrow.left {
+  left: 10px; /* Position left arrow */
+}
+
+.arrow.right {
+  right: 10px; /* Position right arrow */
+}
+
+.arrow:hover {
+  background-color: rgba(255, 255, 255, 1); /* Fully opaque on hover */
+}
+
+
+
+#levelDisplay {
+  font-size: 1.2rem;          /* Slightly larger font for readability */
+  color: #f0f0f0;             /* Light text color for contrast on black background */
+  padding: 8px 16px;          /* Spacing around text*/
+  width: fit-content;         /* Adjust width to content */
+  text-align: center;         /* Center-align text */
+  margin: 0 auto;
+}
+
+
+.progress-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.progress-bar {
+  width: 100%; /* Full width of the container */
+  height: 30px; /* Height of the progress bar */
+  background-color: lightgray; /* Background color of the progress bar */
+  border-radius: 5px; /* Rounded corners */
+  overflow: hidden; /* Clip any overflow */
+}
+
+.progress-fill {
+  height: 100%; /* Full height of the progress bar */
+  background-color: green; /* Color of the fill */
+  transition: width 1s ease-in-out; /* Smooth transition for the fill */
+}
+
